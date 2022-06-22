@@ -48,3 +48,18 @@ class ViewCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model=Comment
         fields=['id','post','comment','date']
+
+class ForgotPasswordSerializers(serializers.ModelSerializer):
+    email=serializers.EmailField(max_length=50)
+    class Meta:
+        model=User
+        fields=['email']
+        
+class ChangePasswordSerializers(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=True)
+    old_password = serializers.CharField(write_only=True, required=True)
+    
+    class Meta:
+        model = User
+        fields = ('old_password', 'password', 'password2')

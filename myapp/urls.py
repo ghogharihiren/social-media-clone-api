@@ -29,6 +29,8 @@ urlpatterns = [
     path('following-list/',FollowingListView.as_view()),
     path('follower-list/',FollowerListView.as_view()),
     
+    path('forgot-password/',ForgotPasswordView.as_view()),
+    path('change-password/',ChangePasswordView.as_view()),
     
     
 ]

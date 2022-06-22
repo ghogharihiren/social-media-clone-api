@@ -1,3 +1,4 @@
+from ast import For
 from django.shortcuts import render
 from .serializers import*
 from .models import*
@@ -10,8 +11,9 @@ from rest_framework import status
 from django.contrib.auth import authenticate,logout
 from django.contrib.auth.hashers import make_password
 from .utils import*
-
-# Create your views here.
+import random
+from django.conf import settings
+from django.core.mail import send_mail
 
 @api_view(['GET'])
 def index(request):
@@ -37,6 +39,8 @@ def index(request):
         'remove-follower':'/remove-follower/user.id',
         'following-list':'/following-list/',
         'follower-list':'/follower-list/',
+        'forgot-password':'/forgot-password/',
+        'change-password':'/change-password/',
     }
     return Response(api_url)
 
@@ -136,7 +140,48 @@ class DeleteProfileView(GenericAPIView):
         user=User.objects.get(id=request.user.id)
         user.delete()
         return Response({'status':status.HTTP_200_OK,'msg':'your account deleted'})
+    
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>forgot-password>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+class ForgotPasswordView(GenericAPIView):
+    serializer_class=ForgotPasswordSerializers
+    
+    def post(self,request):
+        serializer=ForgotPasswordSerializers(data=request.data)
+        if serializer.is_valid():
+            email=serializer.validated_data.get('email')
+            if User.objects.filter(email=email).exists():
+                user=User.objects.get(email=email)
+                password=''.join(random.choices('qwyertovghlk34579385',k=8))
+                subject="Rest Password"
+                message = f"""Hello {user.email},Your New password is {password}"""
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [user.email,]
+                send_mail( subject, message, email_from, recipient_list )
+                user.password=make_password(password)
+                user.save()
+                return Response('your new password send')
+            else:
+                return Response('this email is not register')
+        else:
+            print(serializer.errors)
+            return Response('enter the valid data')
+        
+
+class ChangePasswordView(GenericAPIView):
+    serializer_class=ChangePasswordSerializers
+    permission_classes=[IsAuthenticated]
+    
+    def put(self,request):
+        user=User.objects.get(id=request.user.id)
+        serializer=ChangePasswordSerializers(instance=user,data=request.data)
+        if serializer.is_valid():
+            password=serializer.validated_data.get('password')
+            serializer.save(password=make_password(password))
+            return Response('your password change')
+        else:
+            return Response('enter the valid data')
+        
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> POST >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 class CreatePostView(GenericAPIView):

@@ -7,7 +7,6 @@ from django.conf import settings
 
 
 class MyLoginTokenAuthentications(TokenAuthentication):
-    
     model = None
 
     def get_model(self):
@@ -40,7 +39,7 @@ class MyLoginTokenAuthentications(TokenAuthentication):
     def authenticate_credentials(self, token):
         model = self.get_model()
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms="HS256")
+            payload = jwt.decode(token, "SECRET_KEY", algorithms="HS256")
             email = payload['email']
             userid = payload['id']
             try:

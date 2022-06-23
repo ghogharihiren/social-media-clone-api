@@ -58,8 +58,8 @@ class ForgotPasswordSerializers(serializers.ModelSerializer):
 class ChangePasswordSerializers(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
-    old_password = serializers.CharField(write_only=True, required=True)
     
     class Meta:
         model = User
-        fields = ('old_password', 'password', 'password2')
+        fields = ('password', 'password2')
+        

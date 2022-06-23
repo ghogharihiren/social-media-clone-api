@@ -79,8 +79,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME':'database_name',
+        'HOST':'localhost',
+        'PORT':3306,
+        'USER':'',
+        'PASSWORD':'',
     }
 }
 
@@ -90,7 +94,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':[
         'myapp.authentication.MyLoginTokenAuthentications'
     ],
-   
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 3,
 }
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
